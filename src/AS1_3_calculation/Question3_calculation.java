@@ -192,8 +192,13 @@ public class Question3_calculation {
 				Zbase4 = V4*V4/Sbase;
 				Zbase6 = V6*V6/Sbase;
 				
-				
-
+				/*
+				System.out.println("Zbase1: " + Zbase1 + "\n");
+				System.out.println("Zbase2: " + Zbase2 + "\n");
+				System.out.println("Zbase3: " + Zbase3 + "\n");
+				System.out.println("Zbase4: " + Zbase4 + "\n");
+				System.out.println("Zbase6: " + Zbase6 + "\n");
+				*/
 				Complex YC1 = new Complex(YC1g,YC1b);
 		        Complex YC2 = new Complex(YC2g,YC2b);			       
 			    Complex ZT1 = new Complex(ZT1r/Zbase6,ZT1x/Zbase6);
@@ -223,31 +228,32 @@ public class Question3_calculation {
 			    Complex y[][] = new Complex[5][5];
 			    YL6sh = div(YL6sh, div(ref,Z_base3));
 			    YL2sh = div(YL2sh, div(ref,Z_base3));
-			         y[0][0] = add(div(ref,ZC2),div(ref,ZT1));
-			         y[0][1] = new Complex(0,0);
-			         y[0][2] = new Complex(0,0);
-			         y[0][3] = new Complex(0,0);
-			         y[0][4] = div(refm,ZT1);
-			         y[1][0] = new Complex(0,0);
-			         y[1][1] = add(add(add(div(ref,ZL6),YL6sh),add(div(ref,ZL2),YL2sh)),div(ref,ZLD123));
-			         y[1][2] = add(div(refm,ZL6),div(refm,ZL2));
-			         y[1][3] = new Complex(0,0);
-			         y[1][4] = new Complex(0,0);
-			         y[2][0] = new Complex(0,0);
-			         y[2][1] = add(div(refm,ZL6),div(refm,ZL2));
-			         y[2][2] = add(add(add(add(div(ref,ZL6),YL6sh),add(div(ref,ZL2),YL2sh)),div(ref,ZLD2)),div(ref,ZT2));
-			         y[2][3] = new Complex(0,0);
-			         y[2][4] = div(refm,ZT2);
-			         y[3][0] = new Complex(0,0);
-			         y[3][1] = new Complex(0,0);
-			         y[3][2] = new Complex(0,0);
-			         y[3][3] = div(ref,ZT3);
-			         y[3][4] = div(refm,ZT3);
-			         y[4][0] = div(refm,ZT1);
-			         y[4][1] = new Complex(0,0);
-			         y[4][2] = div(refm,ZT2);
-			         y[4][3] = div(refm,ZT3);
-			         y[4][4] = add(add(div(ref,ZT3),div(ref,ZT1)),add(div(ref,ZC1),div(ref,ZLD1)));
+			         
+			    y[0][0] = add(div(ref,ZC2),div(ref,ZT1));
+			    y[0][1] = new Complex(0,0);
+			    y[0][2] = new Complex(0,0);
+			    y[0][3] = new Complex(0,0);
+			    y[0][4] = div(refm,ZT1);
+			    y[1][0] = new Complex(0,0);
+			    y[1][1] = add(add(add(div(ref,ZL6),YL6sh),add(div(ref,ZL2),YL2sh)),div(ref,ZLD123));
+			    y[1][2] = add(div(refm,ZL6),div(refm,ZL2));
+			    y[1][3] = new Complex(0,0);
+			    y[1][4] = new Complex(0,0);
+			    y[2][0] = new Complex(0,0);
+			    y[2][1] = add(div(refm,ZL6),div(refm,ZL2));
+			    y[2][2] = add(add(add(add(div(ref,ZL6),YL6sh),add(div(ref,ZL2),YL2sh)),div(ref,ZLD2)),div(ref,ZT2));
+			    y[2][3] = new Complex(0,0);
+			    y[2][4] = div(refm,ZT2);
+			    y[3][0] = new Complex(0,0);
+			    y[3][1] = new Complex(0,0);
+			    y[3][2] = new Complex(0,0);
+			    y[3][3] = div(ref,ZT3);
+			    y[3][4] = div(refm,ZT3);
+			    y[4][0] = div(refm,ZT1);
+			    y[4][1] = new Complex(0,0);
+			    y[4][2] = div(refm,ZT2);
+			    y[4][3] = div(refm,ZT3);
+			    y[4][4] = add(add(div(ref,ZT3),div(ref,ZT1)),add(div(ref,ZC1),div(ref,ZLD1)));
 			         
 			        Object[][] output = new Object [5][5];
 					String Y[][] = new String[5][5];
