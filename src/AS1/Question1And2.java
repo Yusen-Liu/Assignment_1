@@ -44,6 +44,8 @@ public class Question1And2 {
 		 conn = DriverManager.getConnection(DB_URL + "PowerSystem"+DISABLE_SSL, USER, PASS);
 		 sql = "USE PowerSystem";
 		 stmt.executeUpdate(sql);
+		 sql = "SET foreign_key_checks = 0 ;";
+		 stmt.executeUpdate(sql);
 		 sql = "DROP TABLE IF EXISTS BaseVoltage";
 		 stmt.executeUpdate(sql);
 		 sql = "DROP TABLE IF EXISTS Substation";
@@ -71,11 +73,11 @@ public class Question1And2 {
 		 stmt.executeUpdate(sql) ; // execute query
 		 sql = "CREATE TABLE IF NOT EXISTS Substation (rdfID VARCHAR(37)  NOT NULL , Name VARCHAR(11) , Region_rdfID VARCHAR(34), PRIMARY KEY(rdfID))"; 
 		 stmt.executeUpdate(sql) ; 
-		 sql = "CREATE TABLE IF NOT EXISTS VoltageLevel (rdfID VARCHAR(37)  NOT NULL , Name VARCHAR(11) , Substation_rdfID VARCHAR(38), baseVoltage_rdfID  VARCHAR(38), PRIMARY KEY(rdfID))"; 
+		 sql = "CREATE TABLE IF NOT EXISTS VoltageLevel (rdfID VARCHAR(37)  NOT NULL , Name VARCHAR(11) , Substation_rdfID VARCHAR(38), baseVoltage_rdfID  VARCHAR(38), PRIMARY KEY(rdfID), FOREIGN KEY(Substation_rdfID) REFERENCES Substation(rdfID), FOREIGN KEY(baseVoltage_rdfID) REFERENCES BaseVoltage(rdfID))"; 
 		 stmt.executeUpdate(sql) ; 
 		 sql = "CREATE TABLE IF NOT EXISTS GeneratingUnit (rdfID VARCHAR(37)  NOT NULL , Name VARCHAR(30) , MaxP VARCHAR(11) , MinP VARCHAR(11), EquipmentContainer_rdfID VARCHAR(38), PRIMARY KEY(rdfID))"; 
 		 stmt.executeUpdate(sql) ; 
-		 sql = "CREATE TABLE IF NOT EXISTS SynchronousMachine (rdfID VARCHAR(37)  NOT NULL, Name VARCHAR(10) , RatedS DOUBLE , P VARCHAR(11), Q VARCHAR(11), GenUnit_rdfID VARCHAR(38), regControl_rdfID VARCHAR(38), EquipmentContainer_rdfID VARCHAR(38) , PRIMARY KEY(rdfID))"; 
+		 sql = "CREATE TABLE IF NOT EXISTS SynchronousMachine (rdfID VARCHAR(37)  NOT NULL, Name VARCHAR(10) , RatedS DOUBLE , P VARCHAR(11), Q VARCHAR(11), GenUnit_rdfID VARCHAR(38), regControl_rdfID VARCHAR(38), EquipmentContainer_rdfID VARCHAR(38) , PRIMARY KEY(rdfID), FOREIGN KEY(GenUnit_rdfID) REFERENCES GeneratingUnit(rdfID), FOREIGN KEY(regControl_rdfID) REFERENCES RegulatingControl(rdfID))"; 
 		 stmt.executeUpdate(sql) ; 
 		 sql = "CREATE TABLE IF NOT EXISTS RegulatingControl (rdfID VARCHAR(37)  NOT NULL, Name VARCHAR(10) , TargetValue VARCHAR(11) , PRIMARY KEY(rdfID))"; 
 		 stmt.executeUpdate(sql) ; 
@@ -164,7 +166,7 @@ public class Question1And2 {
 				
 				String rdfID = element.getAttribute("rdf:ID");
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-			    String regionRfID = regionID.getAttribute("rdf:resource");
+			    String regionRfID = regionID.getAttribute("rdf:resource").substring(1);
 				
 				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "region_rdfID: " + regionRfID + "\n");
 				
@@ -189,8 +191,8 @@ public class Question1And2 {
 				
 				String rdfID = element.getAttribute("rdf:ID");
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-			    String subRfID = subID.getAttribute("rdf:resource");
-				String baseVoltRfID = baseVoltID.getAttribute("rdf:resource");
+			    String subRfID = subID.getAttribute("rdf:resource").substring(1);
+				String baseVoltRfID = baseVoltID.getAttribute("rdf:resource").substring(1);
 				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "substation_rdfID: " + subRfID + "\n" + "baseVoltage_rdfID: " + baseVoltRfID + "\n");
 				
 				String query = "insert into VoltageLevel values(?, ?, ?, ?)";
@@ -214,7 +216,7 @@ public class Question1And2 {
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
 				String maxP = element.getElementsByTagName("cim:GeneratingUnit.maxOperatingP").item(0).getTextContent(); 
 			    String minP = element.getElementsByTagName("cim:GeneratingUnit.minOperatingP").item(0).getTextContent();
-				String containerRfID = containerID.getAttribute("rdf:resource");
+				String containerRfID = containerID.getAttribute("rdf:resource").substring(1);
 				
 				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "maxP: " + maxP + "\n" + "minP: " + minP + "\n" + "equipmentContainer_rdfID: " + containerRfID + "\n");
 				
@@ -229,45 +231,6 @@ public class Question1And2 {
 				preparedStmt.executeUpdate();
 			}
 			
-			System.out.println("\nSychronous Machine: \n" );
-			for (int i = 0; i < machineList.getLength(); i++){
-				Element element = (Element) machineList.item(i);
-				
-				NodeList genUnit = element.getElementsByTagName("cim:RotatingMachine.GeneratingUnit");
-				NodeList regControl = element.getElementsByTagName("cim:RegulatingCondEq.RegulatingControl");
-				NodeList equipment = element.getElementsByTagName("cim:Equipment.EquipmentContainer");
-				
-				Element genUnitID = (Element) genUnit.item(0);
-				Element regConID = (Element) regControl.item(0);
-				Element equipID =  (Element) equipment.item(0);
-				
-				String rdfID = element.getAttribute("rdf:ID");
-				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-				String ratedS = element.getElementsByTagName("cim:RotatingMachine.ratedS").item(0).getTextContent();
-				String genUnitRfID = genUnitID.getAttribute("rdf:resource");
-				String regConRfID = regConID.getAttribute("rdf:resource");
-				String equipRfID = equipID.getAttribute("rdf:resource");
-				
-				Element element2 = (Element) machineList2.item(i);
-				
-				String P = element2.getElementsByTagName("cim:RotatingMachine.p").item(0).getTextContent();
-				String Q = element2.getElementsByTagName("cim:RotatingMachine.q").item(0).getTextContent();
-				
-				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "ratedS: " + ratedS + "\n" + "P: " + P +"\n" + "Q: " + Q +"\n"+ "genUnit_rdfID: " + genUnitRfID + "\n" + "regControl_rdfID: " + regConRfID + "\n" + "equipmentContainer_rdfID: " + equipRfID +"\n" );
-				
-				String query = "insert into SynchronousMachine values(?, ?, ?, ?, ?, ?, ?, ?)";
-				PreparedStatement preparedStmt = conn.prepareStatement(query);
-				preparedStmt.setString(1, rdfID);
-				preparedStmt.setString(2, name);
-				preparedStmt.setString(3, ratedS);
-				preparedStmt.setString(4, P);
-				preparedStmt.setString(5, Q);
-				preparedStmt.setString(6, genUnitRfID);
-				preparedStmt.setString(7, regConRfID);
-				preparedStmt.setString(8, equipRfID);
-				preparedStmt.executeUpdate();
-			}
-
 			System.out.println("\nRegulating Control: \n" );
 			for (int i = 0; i < reguList.getLength(); i++){
 
@@ -290,6 +253,45 @@ public class Question1And2 {
 				preparedStmt.executeUpdate();
 			}
 			
+			System.out.println("\nSychronous Machine: \n" );
+			for (int i = 0; i < machineList.getLength(); i++){
+				Element element = (Element) machineList.item(i);
+				
+				NodeList genUnit = element.getElementsByTagName("cim:RotatingMachine.GeneratingUnit");
+				NodeList regControl = element.getElementsByTagName("cim:RegulatingCondEq.RegulatingControl");
+				NodeList equipment = element.getElementsByTagName("cim:Equipment.EquipmentContainer");
+				
+				Element genUnitID = (Element) genUnit.item(0);
+				Element regConID = (Element) regControl.item(0);
+				Element equipID =  (Element) equipment.item(0);
+				
+				String rdfID = element.getAttribute("rdf:ID");
+				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
+				String ratedS = element.getElementsByTagName("cim:RotatingMachine.ratedS").item(0).getTextContent();
+				String genUnitRfID = genUnitID.getAttribute("rdf:resource").substring(1);
+				String regConRfID = regConID.getAttribute("rdf:resource").substring(1);
+				String equipRfID = equipID.getAttribute("rdf:resource").substring(1);
+				
+				Element element2 = (Element) machineList2.item(i);
+				
+				String P = element2.getElementsByTagName("cim:RotatingMachine.p").item(0).getTextContent();
+				String Q = element2.getElementsByTagName("cim:RotatingMachine.q").item(0).getTextContent();
+				
+				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "ratedS: " + ratedS + "\n" + "P: " + P +"\n" + "Q: " + Q +"\n"+ "genUnit_rdfID: " + genUnitRfID + "\n" + "regControl_rdfID: " + regConRfID + "\n" + "equipmentContainer_rdfID: " + equipRfID +"\n" );
+				
+				String query = "insert into SynchronousMachine values(?, ?, ?, ?, ?, ?, ?, ?)";
+				PreparedStatement preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setString(1, rdfID);
+				preparedStmt.setString(2, name);
+				preparedStmt.setString(3, ratedS);
+				preparedStmt.setString(4, P);
+				preparedStmt.setString(5, Q);
+				preparedStmt.setString(6, genUnitRfID);
+				preparedStmt.setString(7, regConRfID);
+				preparedStmt.setString(8, equipRfID);
+				preparedStmt.executeUpdate();
+			}
+			
 			System.out.println("\nPower Transformer: \n" );
 			for (int i = 0; i < tranList.getLength(); i++){
 				Element element = (Element) tranList.item(i);
@@ -298,7 +300,7 @@ public class Question1And2 {
 				
 				String rdfID = element.getAttribute("rdf:ID");
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-			    String equipRfID = equipID.getAttribute("rdf:resource");
+			    String equipRfID = equipID.getAttribute("rdf:resource").substring(1);
 				
 				System.out.println("rdfID: " + rdfID +"\n" + "name: " + name + "\n" + "equipmentContainer_rdfID: " + equipRfID + "\n");
 
@@ -318,7 +320,7 @@ public class Question1And2 {
 				
 				String rdfID = element.getAttribute("rdf:ID");
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-			    String equipRfID = equipID.getAttribute("rdf:resource");
+			    String equipRfID = equipID.getAttribute("rdf:resource").substring(1);
 				
 				Element element2 = (Element) loadList2.item(i);
 				
@@ -376,7 +378,7 @@ public class Question1And2 {
 				
 				String rdfID = element.getAttribute("rdf:ID");
 				String name = element.getElementsByTagName("cim:IdentifiedObject.name").item(0).getTextContent();
-			    String equipRfID = equipID.getAttribute("rdf:resource");
+			    String equipRfID = equipID.getAttribute("rdf:resource").substring(1);
 				
 				Element element2 = (Element) breakList2.item(i);
 				
